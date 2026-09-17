@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" data-mantine-color-scheme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/convex.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VintedUT</title>
+    <script>
+      // Set the color scheme before first paint to avoid a flash of the wrong theme.
+      try {
+        var stored = window.localStorage.getItem("mantine-color-scheme-value");
+        var scheme =
+          stored === "light" || stored === "dark" || stored === "auto"
+            ? stored
+            : "auto";
+        var computed =
+          scheme !== "auto"
+            ? scheme
+            : window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+        document.documentElement.setAttribute(
+          "data-mantine-color-scheme",
+          computed,
+        );
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

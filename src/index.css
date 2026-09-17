@@ -1,0 +1,11 @@
+/* Mantine provides the base styles; only app-level resets live here. */
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}

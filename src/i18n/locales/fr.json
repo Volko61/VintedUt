@@ -1,0 +1,68 @@
+{
+  "app": {
+    "title": "VintedUT",
+    "subtitle": "Convex + Convex Auth + React + Mantine"
+  },
+  "nav": {
+    "home": "Accueil",
+    "search": "Recherche",
+    "sell": "Vendre",
+    "messages": "Messages",
+    "me": "Profil",
+    "language": "Langue",
+    "theme": "Thème",
+    "signOut": "Déconnexion"
+  },
+  "pages": {
+    "sell": {
+      "title": "Vendre un article",
+      "description": "Mettez en vente ce dont vous n'avez plus besoin et touchez des acheteurs proches."
+    },
+    "messages": {
+      "title": "Messages",
+      "description": "Discutez avec les acheteurs et vendeurs à propos de vos annonces."
+    },
+    "me": {
+      "title": "Mon profil",
+      "description": "Gérez vos annonces, vos commandes et les paramètres de votre compte."
+    }
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "La page que vous cherchez n'existe pas.",
+    "back": "Retour à la recherche"
+  },
+  "theme": {
+    "toggle": "Changer de thème",
+    "light": "Clair",
+    "dark": "Sombre"
+  },
+  "language": {
+    "label": "Langue",
+    "en": "EN",
+    "fr": "FR"
+  },
+  "auth": {
+    "signInTitle": "Connexion",
+    "signUpTitle": "Créer un compte",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "passwordHint": "Au moins 8 caractères",
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "signOut": "Se déconnecter",
+    "noAccount": "Pas encore de compte ?",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "switchToSignUp": "S'inscrire",
+    "switchToSignIn": "Se connecter",
+    "error": "Connexion impossible : {{message}}"
+  },
+  "hello": {
+    "title": "Bonjour !",
+    "intro": "Les messages ci-dessous sont stockés dans la base Convex et se synchronisent en temps réel dans tous les onglets ouverts.",
+    "placeholder": "Écrivez un bonjour…",
+    "send": "Envoyer",
+    "empty": "Aucun message pour l'instant — soyez le premier à dire bonjour !",
+    "loading": "Chargement des messages…"
+  }
+}
