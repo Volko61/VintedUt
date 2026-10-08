@@ -1,19 +1,13 @@
-import { useAuthActions } from "@convex-dev/auth/react";
 import { Group } from "@mantine/core";
 import {
-  IconLogout,
-  IconMessage,
-  IconPlus,
-  IconSearch,
-  IconUser,
+    IconMessage,
+    IconPlus,
+    IconSearch,
+    IconUser
 } from "@tabler/icons-react";
-import { useConvexAuth } from "convex/react";
 import { useTranslation } from "react-i18next";
 
-import { LanguagePicker } from "./LanguagePicker";
-import { NavItem } from "./NavItem";
 import { NavLink } from "./NavLink";
-import { ThemePicker } from "./ThemePicker";
 
 /**
  * Mobile-first bottom navigation bar.
@@ -24,8 +18,6 @@ import { ThemePicker } from "./ThemePicker";
  */
 export function BottomNav() {
   const { t } = useTranslation();
-  const { isAuthenticated } = useConvexAuth();
-  const { signOut } = useAuthActions();
 
   return (
     <Group
@@ -52,18 +44,6 @@ export function BottomNav() {
       />
 
       <NavLink to="/me" icon={<IconUser size={22} />} label={t("nav.me")} />
-
-      <LanguagePicker />
-
-      <ThemePicker />
-
-      {isAuthenticated && (
-        <NavItem
-          icon={<IconLogout size={22} />}
-          label={t("nav.signOut")}
-          onClick={() => void signOut()}
-        />
-      )}
     </Group>
   );
 }

@@ -1,20 +1,32 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useTranslation } from "react-i18next";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 
-import { PagePlaceholder } from "../components/PagePlaceholder";
+import { api } from "../../convex/_generated/api";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { convexQuery } from "@convex-dev/react-query";
 
 export const Route = createFileRoute("/messages")({
   component: MessagesPage,
 });
 
 function MessagesPage() {
-  const { t } = useTranslation();
+  const { data: getMine } = useSuspenseQuery(
+    convexQuery(api.conversations.listMine, {}),
+  );
 
   return (
-    <PagePlaceholder
-      title={t("pages.messages.title")}
-      description={t("pages.messages.description")}
-    />
+    <>
+      {getMine.map((conversation) => {
+        return (
+          <Link
+            to="/messages/$conversationId"
+            params={{ conversationId: conversation.conversationId }}
+            key={conversation._id}
+          >
+            {conversation.conversationId}
+          </Link>
+        );
+      })}
+      <Outlet />
+    </>
   );
 }
-

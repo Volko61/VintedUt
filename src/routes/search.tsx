@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { HelloBoard } from "../components/HelloBoard";
+import { SearchPage } from "../components/SearchPage";
 
 export const Route = createFileRoute("/search")({
-  component: HelloBoard,
+  component: SearchPage,
 });
 
