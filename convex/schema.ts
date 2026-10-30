@@ -9,20 +9,20 @@ export default defineSchema({
   ...authTables,
   conversations: defineTable({
     itemId: v.id("items"),
-  }).index("by_item", ["itemId"]),
-  conversationMembers: defineTable({
-    conversationId: v.id("conversations"),
-    userId: v.id("users"),
-  })
-    .index("by_conversation", ["conversationId"])
-    .index("by_users", ["userId"]),
+    seller: v.id("users"),
+    buyer: v.id("users")
+  }).index("by_item", ["itemId"])
+    .index("by_members", ["seller", "buyer"]),
   messages: defineTable({
     authorId: v.id("users"),
     conversationId: v.id("conversations"),
     content: v.string(),
   })
     .index("by_conversation", ["conversationId"])
-    .index("by_author", ["authorId"]),
+    .index("by_author", ["authorId"])
+    .searchIndex("search_in_content", {
+      searchField: "content",
+    }),
   items: defineTable({
     authorId: v.id("users"),
     title: v.string(),
@@ -32,7 +32,13 @@ export default defineSchema({
     likes: v.number(),
   })
     .index("by_author", ["authorId"])
-    .index("by_price", ["price"]),
+    .index("by_price", ["price"])
+    .searchIndex("search_in_desc", {
+      searchField: "description",
+    })
+    .searchIndex("search_in_title", {
+      searchField: "title",
+    }),
   evaluations: defineTable({
     authorId: v.id("users"),
     aboutUserId: v.id("users"),

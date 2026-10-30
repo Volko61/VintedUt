@@ -10,14 +10,15 @@
 
 import type * as auth from "../auth.js";
 import type * as conversations from "../conversations.js";
+import type * as functions from "../functions.js";
 import type * as http from "../http.js";
 import type * as items from "../items.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_authors from "../lib/authors.js";
-import type * as me from "../me.js";
 import type * as notifications from "../notifications.js";
 import type * as notifications_api from "../notifications/api.js";
 import type * as notifications_client from "../notifications/client.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -28,14 +29,15 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   conversations: typeof conversations;
+  functions: typeof functions;
   http: typeof http;
   items: typeof items;
   "lib/auth": typeof lib_auth;
   "lib/authors": typeof lib_authors;
-  me: typeof me;
   notifications: typeof notifications;
   "notifications/api": typeof notifications_api;
   "notifications/client": typeof notifications_client;
+  users: typeof users;
 }>;
 
 /**

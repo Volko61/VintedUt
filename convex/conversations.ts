@@ -1,130 +1,109 @@
 import { v } from "convex/values";
 
-import { internalQuery, mutation, query } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { mutation, query, QueryCtx } from "./_generated/server";
 import { requireUserId } from "./lib/auth";
-import { loadAuthors, publicAuthor, toPublicAuthor } from "./lib/authors";
-import schema from "./schema";
 import { notifications } from "./notifications/client";
-import { cp } from "fs";
+import { api } from "./_generated/api";
+import { paginationOptsValidator } from "convex/server";
+import { crud } from "convex-helpers/server/crud";
+import schema from "./schema";
+import { customCtx, customMutation, customQuery } from "convex-helpers/server/customFunctions";
+import { Rules, wrapDatabaseWriter } from "convex-helpers/server/rowLevelSecurity";
+import { DataModel } from "./_generated/dataModel";
 
 export const listMine = query({
-  args: {},
   handler: async (ctx, args) => {
     const userId = await requireUserId(ctx);
     return ctx.db
-      .query("conversationMembers")
-      .withIndex("by_users", (q) => q.eq("userId", userId))
+      .query("conversations")
+      .filter((q) =>
+        q.or(q.eq(q.field("seller"), userId), q.eq(q.field("buyer"), userId)),
+      )
       .collect();
-  },
-});
-
-export const getMembers = query({
-  args: {
-    conversationId: v.id("conversations")
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db.query("conversationMembers").withIndex("by_conversation", (q)=>q.eq("conversationId", args.conversationId)).collect()
   },
 });
 
 export const get = query({
   args: {
     conversationId: v.id("conversations"),
-    limit: v.optional(v.number()),
+    paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     await requireUserId(ctx);
-
     const messages = await ctx.db
       .query("messages")
       .withIndex("by_conversation", (q) =>
         q.eq("conversationId", args.conversationId),
       )
-      .collect();
+      .paginate(args.paginationOpts);
+    if (messages == null) throw Error(`Cannot find the messages for conversation ${args.conversationId}`)
 
-    return await Promise.all(
-      messages.map(async (msg) => {
-        const sender = await ctx.db.get(msg.authorId);
-        return {
-          ...msg,
-          sender: sender
-            ? {
-                name: sender.name,
-                avatarUrl: sender.image,
-              }
-            : {
-                name: "Unknown user name",
-                avatarUrl: "/default-avatar.png",
-              },
-        };
-      }),
-    );
+    return messages
   },
 });
 
-export const getSellerAndBuyer = internalQuery({
+export const latestMessage = query({
   args: {
     conversationId: v.id("conversations"),
   },
   handler: async (ctx, args) => {
-    const conversation = await ctx.db.get(args.conversationId);
-    if (!conversation) {
-      throw new Error("Conversation introuvable");
-    }
-
-    const item = await ctx.db.get(conversation.itemId);
-    if (!item) throw new Error("Article introuvable");
-
-    const members = await ctx.db
-      .query("conversationMembers")
+    await requireUserId(ctx);
+    const message = await ctx.db
+      .query("messages")
       .withIndex("by_conversation", (q) =>
         q.eq("conversationId", args.conversationId),
       )
-      .collect();
+      .order("desc")
+      .first();
+    if (message == null) throw Error(`Cannot find the latest message for conversation ${args.conversationId}`)
 
-    const sellerId = item.authorId;
-
-    const buyerMember = members.find((m) => m.userId !== sellerId);
-    const buyerId = buyerMember ? buyerMember.userId : null;
-
-    const [seller, buyer] = await Promise.all([
-      ctx.db.get(sellerId),
-      buyerId ? ctx.db.get(buyerId) : null,
-    ]);
-
-    return {
-      seller,
-      buyer,
-    };
+    return message
   },
 });
 
-export const send = mutation({
+export const createConversation = mutation({
   args: {
     itemId: v.id("items"),
-    content: v.string(),
+    content: v.string()
   },
   handler: async (ctx, args) => {
     const userId = await requireUserId(ctx);
     const itemId = args.itemId;
     const item = await ctx.db.get("items", itemId);
-    if (!item) throw new Error("Article introuvable");
+    if (!item) throw new Error(`Article ${itemId} introuvable`);
 
-    const existingConversation = await ctx.db
+    const conversation = await ctx.db
       .query("conversations")
       .withIndex("by_item", (q) => q.eq("itemId", itemId))
       .first();
 
-    const conversationId =
-      existingConversation?._id ??
-      (await ctx.db.insert("conversations", { itemId }));
+    if (conversation == null) {
+      const conversationId = (await ctx.db.insert("conversations", { itemId: itemId, seller: userId, buyer: userId }));
+      const conversation = ctx.db
+        .query("conversations")
+        .withIndex("by_item", (q) => q.eq("itemId", itemId))
+        .first();
+    }
+    if (!conversation) throw new Error(`Conversation ${conversation} not found`)
 
-    const { seller, buyer } = await ctx.runQuery(
-      internal.conversations.getSellerAndBuyer,
-      { conversationId },
-    );
-    const targetId = seller?._id === userId ? buyer?._id : seller?._id;
+    ctx.runMutation(api.conversations.send, { conversationId: conversation._id, content: args.content })
+  },
+});
+
+export const send = mutation({
+  args: {
+    conversationId: v.id("conversations"),
+    content: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await requireUserId(ctx);
+
+    const conversation = await ctx.db
+      .get("conversations", args.conversationId)
+
+    if (!conversation) throw new Error(`Conversation ${args.conversationId} not found`)
+
+    const targetId = conversation.seller === userId ? conversation.buyer : conversation.seller;
     if (targetId) {
       await notifications.create(ctx, {
         targetId,
@@ -136,9 +115,34 @@ export const send = mutation({
       });
     }
     return await ctx.db.insert("messages", {
-      conversationId,
+      conversationId: conversation._id,
       authorId: userId,
       content: args.content,
     });
   },
 });
+
+
+async function rlsRules(ctx: QueryCtx) {
+  const userId = await requireUserId(ctx);
+  return {
+    conversations: {
+      read: async (_, conversation) => {
+        return conversation.buyer === userId || conversation.seller === userId;
+      },
+    },
+  } satisfies Rules<QueryCtx, DataModel>;
+}
+
+const mutationWithRLS = customMutation(
+  mutation,
+  customCtx(async (ctx) => ({
+    db: wrapDatabaseWriter(ctx, ctx.db, await rlsRules(ctx)),
+  })),
+);
+export const { read } = crud(
+  schema,
+  "conversations",
+  customQuery(query, customCtx(async () => ({}))),
+  mutationWithRLS,
+);

@@ -19,7 +19,7 @@ export const Route = createFileRoute("/me")({
 function MePage() {
   const { t } = useTranslation();
   const { isAuthenticated } = useConvexAuth();
-  const { data: me } = useSuspenseQuery(convexQuery(api.me.me, {}));
+  const { data: me } = useSuspenseQuery(convexQuery(api.users.me, {}));
 
   const { signOut } = useAuthActions();
 
