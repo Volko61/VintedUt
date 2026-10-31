@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePaginatedQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Doc, Id } from "../../convex/_generated/dataModel";
+import { Link } from "@tanstack/react-router";
 
 export function Chat({ conversationId }: { conversationId: Id<"conversations"> }) {
   const { data: conversation } = useSuspenseQuery(
@@ -23,7 +24,13 @@ export function Chat({ conversationId }: { conversationId: Id<"conversations"> }
   return (
     <>
       <div>
-        Conversation between {seller.name} and {buyer.name}
+        Conversation between <Link
+          to="/user/$userId"
+          params={{ userId: seller._id }}
+        >{seller.name}</Link> and <Link
+          to="/user/$userId"
+          params={{ userId: buyer._id }}
+        >{buyer.name}</Link>
       </div>
       <div>
         {messages.map((message) => (

@@ -43,6 +43,20 @@ export const search = query({
   },
 });
 
+
+export const listOfUser = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.query("items").withIndex("by_author", (q) => q.eq("authorId", args.userId)).paginate({
+      ...args.paginationOpts,
+      maximumRowsRead: 500,
+    });
+  },
+});
+
 export const create = mutation({
   args: {
     title: v.string(),

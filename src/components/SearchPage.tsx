@@ -22,7 +22,7 @@ export function SearchPage() {
 
   return <>
     <Flex gap={20} direction="column">
-      {results.map((item) => <ItemCard key={item._id} item={item} />)}
+      {results.map((item) => <ItemCard key={item._id} itemId={item._id} />)}
       {status === "CanLoadMore" && (
         <Button onClick={() => loadMore(10)}>Load more</Button>
       )}

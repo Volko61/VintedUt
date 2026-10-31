@@ -28,6 +28,7 @@ export const getEvalsAboutUser = query({
     },
 });
 
+
 export const getEvalAverageAboutUser = query({
     args: {
         userId: v.id("users")
@@ -41,6 +42,6 @@ export const getEvalAverageAboutUser = query({
             average += evaluation.stars
         })
         average /= evaluations.length
-        return {average, numberOfReviews: evaluations.length}
+        return { average, numberOfReviews: evaluations.length }
     },
 });

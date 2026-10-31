@@ -82,8 +82,6 @@ function ItemPage({ itemId }: { itemId: Id<"items"> }) {
             </Group>
             <Text>{item.description}</Text>
             <Stack>
-                <Button>Acheter</Button>
-                <Button>Faire une offre</Button>
                 <Button onClick={() => {
                     createConversation({ content: "hi", itemId })
                 }}>Message</Button>
