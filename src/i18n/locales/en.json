@@ -16,7 +16,14 @@
   "pages": {
     "sell": {
       "title": "Sell an item",
-      "description": "List something you no longer need and reach buyers nearby."
+      "description": "List something you no longer need and reach buyers nearby.",
+      "form": {
+        "title": "Title",
+        "description": "Description",
+        "price": "Price (€)",
+        "submit": "Publish",
+        "created": "Item published!"
+      }
     },
     "messages": {
       "title": "Messages",
@@ -64,5 +71,13 @@
     "send": "Send",
     "empty": "No messages yet — be the first to say hello!",
     "loading": "Loading messages…"
+  },
+  "dropzone": {
+    "title": "Drag images here or click to select files",
+    "hint": "Attach as many images as you like, each file should not exceed 5mb",
+    "remove": "Remove image",
+    "uploadFailed": "Some images could not be uploaded.",
+    "rejected_one": "{{count}} file rejected (images up to 5mb only).",
+    "rejected_other": "{{count}} files rejected (images up to 5mb only)."
   }
 }

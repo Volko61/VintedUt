@@ -1,15 +1,14 @@
 import { v } from "convex/values";
 
-import { mutation, query, QueryCtx } from "./_generated/server";
+import { mutation, MutationCtx, query, QueryCtx } from "./_generated/server";
 import { requireUserId } from "./lib/auth";
 import { notifications } from "./notifications/client";
-import { api } from "./_generated/api";
 import { paginationOptsValidator } from "convex/server";
 import { crud } from "convex-helpers/server/crud";
 import schema from "./schema";
 import { customCtx, customMutation, customQuery } from "convex-helpers/server/customFunctions";
 import { Rules, wrapDatabaseWriter } from "convex-helpers/server/rowLevelSecurity";
-import { DataModel } from "./_generated/dataModel";
+import { DataModel, Id } from "./_generated/dataModel";
 
 export const listMine = query({
   handler: async (ctx, args) => {
@@ -72,23 +71,52 @@ export const createConversation = mutation({
     const item = await ctx.db.get("items", itemId);
     if (!item) throw new Error(`Article ${itemId} introuvable`);
 
-    const conversation = await ctx.db
+    // One conversation per (item, buyer): reuse it if this user already contacted the seller.
+    const existing = await ctx.db
       .query("conversations")
       .withIndex("by_item", (q) => q.eq("itemId", itemId))
+      .filter((q) => q.eq(q.field("buyer"), userId))
       .first();
 
-    if (conversation == null) {
-      const conversationId = (await ctx.db.insert("conversations", { itemId: itemId, seller: userId, buyer: userId }));
-      const conversation = ctx.db
-        .query("conversations")
-        .withIndex("by_item", (q) => q.eq("itemId", itemId))
-        .first();
-    }
-    if (!conversation) throw new Error(`Conversation ${conversation} not found`)
+    const conversationId =
+      existing?._id ??
+      (await ctx.db.insert("conversations", {
+        itemId,
+        seller: item.authorId,
+        buyer: userId,
+      }));
 
-    ctx.runMutation(api.conversations.send, { conversationId: conversation._id, content: args.content })
+    await sendMessage(ctx, userId, conversationId, args.content);
+    return conversationId;
   },
 });
+
+async function sendMessage(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+  conversationId: Id<"conversations">,
+  content: string,
+) {
+  const conversation = await ctx.db.get("conversations", conversationId);
+  if (!conversation) throw new Error(`Conversation ${conversationId} not found`)
+
+  const targetId = conversation.seller === userId ? conversation.buyer : conversation.seller;
+  if (targetId) {
+    await notifications.create(ctx, {
+      targetId,
+      kind: "newMessage",
+      data: {
+        content,
+        href: "/messages/",
+      },
+    });
+  }
+  return await ctx.db.insert("messages", {
+    conversationId: conversation._id,
+    authorId: userId,
+    content,
+  });
+}
 
 export const send = mutation({
   args: {
@@ -97,28 +125,7 @@ export const send = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await requireUserId(ctx);
-
-    const conversation = await ctx.db
-      .get("conversations", args.conversationId)
-
-    if (!conversation) throw new Error(`Conversation ${args.conversationId} not found`)
-
-    const targetId = conversation.seller === userId ? conversation.buyer : conversation.seller;
-    if (targetId) {
-      await notifications.create(ctx, {
-        targetId,
-        kind: "newMessage",
-        data: {
-          content: args.content,
-          href: "/messages/",
-        },
-      });
-    }
-    return await ctx.db.insert("messages", {
-      conversationId: conversation._id,
-      authorId: userId,
-      content: args.content,
-    });
+    return await sendMessage(ctx, userId, args.conversationId, args.content);
   },
 });
 

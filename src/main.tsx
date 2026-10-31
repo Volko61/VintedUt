@@ -10,7 +10,9 @@ import { RouterProvider } from "@tanstack/react-router";
 
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import "@mantine/dropzone/styles.css";
 import "./index.css";
+import '@mantine/carousel/styles.css';
 
 import "./i18n";
 import { router } from "./router";

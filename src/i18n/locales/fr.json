@@ -16,7 +16,14 @@
   "pages": {
     "sell": {
       "title": "Vendre un article",
-      "description": "Mettez en vente ce dont vous n'avez plus besoin et touchez des acheteurs proches."
+      "description": "Mettez en vente ce dont vous n'avez plus besoin et touchez des acheteurs proches.",
+      "form": {
+        "title": "Titre",
+        "description": "Description",
+        "price": "Prix (€)",
+        "submit": "Publier",
+        "created": "Annonce publiée !"
+      }
     },
     "messages": {
       "title": "Messages",
@@ -64,5 +71,13 @@
     "send": "Envoyer",
     "empty": "Aucun message pour l'instant — soyez le premier à dire bonjour !",
     "loading": "Chargement des messages…"
+  },
+  "dropzone": {
+    "title": "Glissez des images ici ou cliquez pour en sélectionner",
+    "hint": "Ajoutez autant d'images que vous voulez, 5 Mo maximum par fichier",
+    "remove": "Supprimer l'image",
+    "uploadFailed": "Certaines images n'ont pas pu être envoyées.",
+    "rejected_one": "{{count}} fichier refusé (image de 5 Mo maximum).",
+    "rejected_other": "{{count}} fichiers refusés (images de 5 Mo maximum)."
   }
 }

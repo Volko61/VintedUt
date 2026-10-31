@@ -12,9 +12,6 @@ export const Route = createFileRoute("/messages/$conversationId")({
 function RouteComponent() {
   const { conversationId: conversationIdRaw } = Route.useParams();
   const conversationId = conversationIdRaw as Id<"conversations">;
-  const { data: conversations } = useSuspenseQuery(
-    convexQuery(api.conversations.get, { conversationId }),
-  );
   return (
     <Chat conversationId={conversationId} />
   );

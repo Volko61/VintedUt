@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { BottomNav } from "../components/BottomNav";
 import { SignInForm } from "../components/SignInForm";
+import ItemSearchInput from "@/components/ItemSearchInput";
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -24,7 +25,9 @@ function RootLayout() {
     >
       <Authenticated>
         <AppShell.Main>
-          <Outlet />
+          <ItemSearchInput>
+            <Outlet />
+          </ItemSearchInput>
         </AppShell.Main>
 
         <AppShell.Footer>

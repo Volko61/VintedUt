@@ -1,4 +1,5 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useMatch } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 import { api } from "../../convex/_generated/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -10,9 +11,23 @@ export const Route = createFileRoute("/messages")({
 });
 
 function MessagesPage() {
+  const { t } = useTranslation();
+  const inConversation = useMatch({
+    from: "/messages/$conversationId",
+    shouldThrow: false,
+  });
   const { data: getMine } = useSuspenseQuery(
     convexQuery(api.conversations.listMine, {}),
   );
+
+  if (inConversation) {
+    return (
+      <>
+        <Link to="/messages">← {t("nav.messages")}</Link>
+        <Outlet />
+      </>
+    );
+  }
 
   return (
     <>
