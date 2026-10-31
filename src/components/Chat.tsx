@@ -1,9 +1,11 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { usePaginatedQuery } from "convex/react";
+import { useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Doc, Id } from "../../convex/_generated/dataModel";
 import { Link } from "@tanstack/react-router";
+import { Button, Group, Input } from "@mantine/core";
+import { useState } from "react";
 
 export function Chat({ conversationId }: { conversationId: Id<"conversations"> }) {
   const { data: conversation } = useSuspenseQuery(
@@ -21,6 +23,9 @@ export function Chat({ conversationId }: { conversationId: Id<"conversations"> }
   if (seller == null) throw Error("Cannot find the seller")
   if (buyer == null) throw Error("Cannot find the buyer")
   if (item == null) throw Error("Cannot find the item")
+  const [message, setMessage] = useState("")
+  const sendMessage = useMutation(api.conversations.send);
+
   return (
     <>
       <div>
@@ -37,6 +42,13 @@ export function Chat({ conversationId }: { conversationId: Id<"conversations"> }
           <ChatMessage key={message._id} message={message} />
         ))}
       </div>
+      <Group>
+        <Input placeholder="Salut, comment ca va ? ..." value={message}
+          onChange={(newMessage) => setMessage(newMessage.target.value)} />
+        <Button onClick={() => {
+          sendMessage({ content: message, conversationId })
+        }}>Send</Button>
+      </Group>
     </>
   );
 }
