@@ -52,6 +52,7 @@ function NotFound() {
         <Text c="dimmed">{t("notFound.description")}</Text>
         <Link
           to="/search"
+          search={{ filter: "", query: "", sort: "newest" }}
           style={{ color: "var(--mantine-primary-color-filled)" }}
         >
           {t("notFound.back")}

@@ -1,16 +1,14 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePaginatedQuery } from "convex/react";
-import { useTranslation } from "react-i18next";
 import { api } from "../../convex/_generated/api";
 import { Doc, Id } from "../../convex/_generated/dataModel";
 
 export function Chat({ conversationId }: { conversationId: Id<"conversations"> }) {
-  const { t } = useTranslation();
   const { data: conversation } = useSuspenseQuery(
     convexQuery(api.conversations.read, { id: conversationId }),
   );
-  const { results: messages, status, loadMore } = usePaginatedQuery(
+  const { results: messages } = usePaginatedQuery(
     api.conversations.get, { conversationId }, { initialNumItems: 5 },
   );
   if (!conversation) throw new Error(`Conversation ${conversationId} not found`)
@@ -22,7 +20,6 @@ export function Chat({ conversationId }: { conversationId: Id<"conversations"> }
   if (seller == null) throw Error("Cannot find the seller")
   if (buyer == null) throw Error("Cannot find the buyer")
   if (item == null) throw Error("Cannot find the item")
-  const otherPerson = me._id === seller._id ? buyer : seller
   return (
     <>
       <div>

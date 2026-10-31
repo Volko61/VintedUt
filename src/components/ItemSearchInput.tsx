@@ -17,7 +17,7 @@ function ItemSearchInput({ children }: { children: ReactNode }) {
     useEffect(() => {
         const trimmed = debounced.trim()
         if (trimmed === urlQuery) return
-        navigate({ to: '/search', search: (prev) => ({ ...prev, query: trimmed }), replace: true })
+        navigate({ to: '/search', search: (prev) => ({ filter: '', sort: 'newest', ...prev, query: trimmed }), replace: true })
     }, [debounced])
 
     return (<>

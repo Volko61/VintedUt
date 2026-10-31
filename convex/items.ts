@@ -11,7 +11,7 @@ import { crud } from "convex-helpers/server/crud";
 import { stream } from "convex-helpers/server/stream";
 import { customCtx, customMutation, customQuery } from "convex-helpers/server/customFunctions";
 import { Rules, wrapDatabaseWriter } from "convex-helpers/server/rowLevelSecurity";
-import { DataModel, Id } from "./_generated/dataModel";
+import { DataModel } from "./_generated/dataModel";
 
 
 export const search = query({

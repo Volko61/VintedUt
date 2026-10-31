@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-imports */
 import { mutation as rawMutation, internalMutation as rawInternalMutation } from "./_generated/server";
 /* eslint-enable no-restricted-imports */
-import { DataModel, Id } from "./_generated/dataModel";
+import { DataModel } from "./_generated/dataModel";
 import { Triggers } from "convex-helpers/server/triggers";
 import { customCtx, customMutation } from "convex-helpers/server/customFunctions";
 
@@ -20,7 +20,7 @@ triggers.register("items", async (ctx, change) => {
   }
 });
 
-triggers.register("items", async (ctx, change) => {
+triggers.register("items", async (_ctx, change) => {
   const changedItem = change.newDoc
   if (changedItem) {
     if (!Number.isFinite(changedItem.price) || changedItem.price < 0) {

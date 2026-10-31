@@ -11,7 +11,7 @@ import { Rules, wrapDatabaseWriter } from "convex-helpers/server/rowLevelSecurit
 import { DataModel, Id } from "./_generated/dataModel";
 
 export const listMine = query({
-  handler: async (ctx, args) => {
+  handler: async (ctx) => {
     const userId = await requireUserId(ctx);
     return ctx.db
       .query("conversations")

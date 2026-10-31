@@ -5,6 +5,6 @@ export const Route = createFileRoute("/")({
 });
 
 function IndexRedirect() {
-  return <Navigate to="/search" replace />;
+  return <Navigate to="/search" search={{ filter: "", query: "", sort: "newest" }} replace />;
 }
 
